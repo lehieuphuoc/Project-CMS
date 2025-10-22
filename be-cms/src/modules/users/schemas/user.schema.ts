@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Role } from '@/modules/roles/schemas/role.schema'; 
+import { Role } from '@/modules/roles/schemas/role.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -16,17 +16,17 @@ export enum AuthProvider {
   GITHUB = 'github',
 }
 
-@Schema({ 
-  timestamps: true,           // Tự động thêm createdAt, updatedAt
-  toJSON: { virtuals: true },     // Bật 'id' ảo khi chuyển sang JSON
-  toObject: { virtuals: true }    // Bật 'id' ảo khi chuyển sang Object
+@Schema({
+  timestamps: true, // Tự động thêm createdAt, updatedAt
+  toJSON: { virtuals: true }, // Bật 'id' ảo khi chuyển sang JSON
+  toObject: { virtuals: true }, // Bật 'id' ảo khi chuyển sang Object
 })
 export class User {
   @Prop({ required: [true, 'Họ và tên không được để trống'], trim: true })
   name: string;
 
   @Prop({ trim: true, default: null })
-  avatarUrl: string; 
+  avatarUrl: string;
 
   @Prop({
     trim: true,
@@ -34,7 +34,7 @@ export class User {
   age: number;
 
   @Prop()
-  address: string; 
+  address: string;
 
   @Prop({
     required: [true, 'Email không được để trống'],
@@ -54,7 +54,7 @@ export class User {
     match: [/^[+]?[0-9\s()-]{7,20}$/, 'Định dạng số điện thoại không hợp lệ'],
     unique: true,
     sparse: true, // Cho phép nhiều document có giá trị null
-    index: true,  // Thêm index cho phone để tìm kiếm nhanh
+    index: true, // Thêm index cho phone để tìm kiếm nhanh
   })
   phone: string;
 
@@ -78,6 +78,7 @@ export class User {
     default: null,
   })
   providerId: string;
+
   // --- Hết ---
 
   @Prop({
@@ -93,9 +94,12 @@ export const UserSchema = SchemaFactory.createForClass(User);
 // --- Các chỉ mục (Index) để tối ưu tìm kiếm ---
 
 // Tối ưu tìm kiếm cho Social Login
-// Đảm bảo (provider + providerId) là duy nhất
-// nhưng bỏ qua các document có providerId là null (dùng sparse)
+// Đảm bảo không có hai người dùng cùng provider và providerId
+// với điều kiện providerId không null hoặc undefined
 UserSchema.index(
-  { provider: 1, providerId: 1 }, 
-  { unique: true, sparse: true }
+  { provider: 1, providerId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { providerId: { $exists: true, $ne: null } },
+  },
 );

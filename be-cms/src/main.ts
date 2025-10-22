@@ -10,8 +10,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,            // Loại bỏ các thuộc tính không được định nghĩa trong DTO
-    forbidNonWhitelisted: true, // Ném lỗi nếu có thuộc tính không được định nghĩa trong DTO
-    transform: true,           // Tự động chuyển đổi payload thành các instance của lớp DTO
+   
   }));
 
   app.setGlobalPrefix('api', { exclude: [''] });

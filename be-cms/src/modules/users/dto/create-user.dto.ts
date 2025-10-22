@@ -1,8 +1,7 @@
 import {
   IsEmail,
   IsEnum,
-  IsEmpty,
-    IsNotEmpty,
+  IsNotEmpty,
   IsOptional,
   IsString,
   MinLength,
@@ -50,6 +49,7 @@ export class CreateUserDto {
   @IsString()
   providerId?: string;
 
-  @IsNotEmpty({ message: 'Vai trò là bắt buộc' })
-  role: string; // ObjectId string
+  @IsOptional()
+  @IsString()
+  role?: string; // ObjectId string
 }
