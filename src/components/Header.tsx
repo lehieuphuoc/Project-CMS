@@ -291,7 +291,7 @@ export default function Header() {
                     {user ? (
                         <div className="flex flex-col gap-2">
                             <Link
-                                href="/profile"
+                                href="/account"
                                 onClick={() => setMenuOpen(false)}
                                 className="hover:text-green-600"
                             >

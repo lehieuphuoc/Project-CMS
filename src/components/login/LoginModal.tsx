@@ -26,7 +26,7 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    // ✅ Hàm xử lý form (đã thêm phần fetch API)
+    //  Hàm xử lý form (đã thêm phần fetch API)
     const handleSubmit = async (values: any) => {
         setLoading(true);
         try {

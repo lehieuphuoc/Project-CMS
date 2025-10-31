@@ -2,7 +2,7 @@
 
 import "@/app/globals.css";
 import { useEffect, useState } from "react";
-import { Card, Avatar, Descriptions, Button, message } from "antd";
+import { Card, Avatar, Descriptions, Button, message, Spin } from "antd";
 import { UserOutlined, EditOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
@@ -20,15 +20,24 @@ export default function AccountPage() {
     const router = useRouter();
 
     useEffect(() => {
-       
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        } else {
-            message.warning("Vui lòng đăng nhập trước khi xem thông tin tài khoản.");
-            router.push("/login");
+        // 👇 Kiểm tra localStorage trong client
+        if (typeof window !== "undefined") {
+            const storedUser = localStorage.getItem("user");
+
+            if (storedUser) {
+                try {
+                    setUser(JSON.parse(storedUser));
+                } catch (error) {
+                    console.error("Lỗi đọc dữ liệu user:", error);
+                    message.error("Dữ liệu người dùng không hợp lệ!");
+                }
+            } else {
+                message.warning("Vui lòng đăng nhập trước khi xem thông tin tài khoản.");
+                router.push("/login");
+            }
+
+            setLoading(false);
         }
-        setLoading(false);
     }, [router]);
 
     const handleLogout = () => {
@@ -37,7 +46,15 @@ export default function AccountPage() {
         router.push("/");
     };
 
-    if (loading) return <p>Đang tải...</p>;
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <Spin tip="Đang tải..." size="large" />
+            </div>
+        );
+    }
+
+    if (!user) return null;
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
@@ -58,19 +75,19 @@ export default function AccountPage() {
                     <Avatar
                         size={100}
                         icon={<UserOutlined />}
-                        src={user?.avatar || undefined}
+                        src={user.avatar || undefined}
                         className="mb-4"
                     />
-                    <h2 className="text-xl font-semibold">{user?.name}</h2>
+                    <h2 className="text-xl font-semibold">{user.name}</h2>
                 </div>
 
                 <Descriptions bordered column={1} size="middle">
-                    <Descriptions.Item label="Email">{user?.email}</Descriptions.Item>
+                    <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
                     <Descriptions.Item label="Số điện thoại">
-                        {user?.phone || "Chưa cập nhật"}
+                        {user.phone || "Chưa cập nhật"}
                     </Descriptions.Item>
                     <Descriptions.Item label="Địa chỉ">
-                        {user?.address || "Chưa cập nhật"}
+                        {user.address || "Chưa cập nhật"}
                     </Descriptions.Item>
                 </Descriptions>
 

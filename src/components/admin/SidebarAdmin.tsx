@@ -1,23 +1,23 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     DashboardOutlined,
     FileTextOutlined,
     UserOutlined,
     SettingOutlined,
-    BarChartOutlined,
     LogoutOutlined,
     AppstoreOutlined,
     CommentOutlined,
-    TeamOutlined, 
+    TeamOutlined,
 } from "@ant-design/icons";
-import { Menu, Layout } from "antd";
+import { Menu, Layout, Modal, message } from "antd";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const { Sider } = Layout;
+const { confirm } = Modal;
 
 interface SidebarProps {
     collapsed: boolean;
@@ -25,8 +25,32 @@ interface SidebarProps {
 
 export default function Sidebar({ collapsed }: SidebarProps) {
     const pathname = usePathname();
+    const router = useRouter();
+    const [mounted, setMounted] = useState(false);
 
-    const items = [
+    useEffect(() => {
+        // Đảm bảo chỉ render menu sau khi client đã mount
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        // Tránh hydration mismatch bằng cách không render gì trước khi mount
+        return (
+            <Sider
+                trigger={null}
+                collapsible
+                collapsed={collapsed}
+                width={230}
+                className="min-h-screen"
+                style={{
+                    background:
+                        "linear-gradient(180deg, #001529 0%, #000d1a 100%)",
+                }}
+            />
+        );
+    }
+
+    const menuItems = [
         {
             key: "/admin",
             icon: <DashboardOutlined />,
@@ -50,32 +74,41 @@ export default function Sidebar({ collapsed }: SidebarProps) {
         {
             key: "/admin/user-comments",
             icon: <TeamOutlined />,
-            label: <Link href="/admin/user-comments">Bình luận theo người dùng</Link>,
+            label: (
+                <Link href="/admin/user-comments">Bình luận theo người dùng</Link>
+            ),
         },
         {
             key: "/admin/Users",
             icon: <UserOutlined />,
             label: <Link href="/admin/Users">Người dùng</Link>,
         },
-        {
-            key: "/admin/reports",
-            icon: <BarChartOutlined />,
-            label: <Link href="/admin/reports">Báo cáo</Link>,
-        },
-        {
-            key: "/admin/settings",
-            icon: <SettingOutlined />,
-            label: <Link href="/admin/settings">Cài đặt</Link>,
-        },
-        {
-            type: "divider" as const,
-        },
+    ];
+
+    const logoutItem = [
         {
             key: "logout",
             icon: <LogoutOutlined />,
             label: <span className="text-red-400">Đăng xuất</span>,
+            onClick: handleLogout,
         },
     ];
+
+    function handleLogout() {
+        confirm({
+            title: "Xác nhận đăng xuất",
+            content: "Bạn có chắc chắn muốn đăng xuất không?",
+            okText: "Đăng xuất",
+            okType: "danger",
+            cancelText: "Hủy",
+            async onOk() {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                message.success("Đăng xuất thành công!");
+                router.push("/login");
+            },
+        });
+    }
 
     return (
         <Sider
@@ -83,12 +116,11 @@ export default function Sidebar({ collapsed }: SidebarProps) {
             collapsible
             collapsed={collapsed}
             width={230}
-            className="min-h-screen"
+            className="min-h-screen flex flex-col"
             style={{
                 background: "linear-gradient(180deg, #001529 0%, #000d1a 100%)",
             }}
         >
-            {/* Logo */}
             <div className="flex flex-col items-center py-4 border-b border-gray-800">
                 <Image
                     src="/logo-pc.png"
@@ -104,15 +136,27 @@ export default function Sidebar({ collapsed }: SidebarProps) {
                 )}
             </div>
 
-            {/* Menu */}
-            <Menu
-                theme="dark"
-                mode="inline"
-                selectedKeys={[pathname]}
-                items={items}
-                className="mt-2"
-                style={{ background: "transparent" }}
-            />
+            {/* Menu chính */}
+            <div className="flex-1 overflow-y-auto">
+                <Menu
+                    theme="dark"
+                    mode="inline"
+                    selectedKeys={[pathname]}
+                    items={menuItems}
+                    style={{ background: "transparent" }}
+                />
+            </div>
+
+            {/* Đăng xuất */}
+            <div className="border-t border-gray-800">
+                <Menu
+                    theme="dark"
+                    mode="inline"
+                    selectedKeys={[]}
+                    items={logoutItem}
+                    style={{ background: "transparent" }}
+                />
+            </div>
         </Sider>
     );
 }
