@@ -13,6 +13,7 @@
     "@ant-design/nextjs-registry": "1.1.0",
     "antd": "^5.27.5",
     "autoprefixer": "^10.4.21",
+    "bcryptjs": "^3.0.2",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.546.0",
     "mongoose": "^8.19.2",

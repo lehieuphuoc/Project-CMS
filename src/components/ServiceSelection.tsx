@@ -31,7 +31,7 @@ export default function ServiceSelection() {
                         <Title level={2} className="!text-white !mb-2 font-bold">
                             Lựa chọn dịch vụ
                         </Title>
-                        <Text className="!text-blue-100 text-base">npm install @ant-design/icons@5.x --save
+                        <Text className="!text-blue-100 text-base">
                             Quý khách vui lòng chọn dịch vụ y tế phù hợp với nhu cầu của mình.
                         </Text>
                     </div>

@@ -26,18 +26,30 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
+    // ✅ Hàm xử lý form (đã thêm phần fetch API)
     const handleSubmit = async (values: any) => {
         setLoading(true);
         try {
-            if (isLogin) {
-                message.success("Đăng nhập thành công!");
-            } else {
-                message.success("Đăng ký tài khoản thành công!");
+            const type = isLogin ? "login" : "register";
+
+            const res = await fetch("/api/users", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...values, type }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                message.error(data.message || "Lỗi không xác định");
+                return;
             }
 
+            message.success(data.message);
             router.push("/");
             onClose();
         } catch (err) {
+            console.error(err);
             message.error("Có lỗi xảy ra, vui lòng thử lại!");
         } finally {
             setLoading(false);
@@ -122,12 +134,13 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
 
             {/* Form */}
             <Form layout="vertical" onFinish={handleSubmit} className="mt-4">
-                {/* Chỉ hiển thị Tên Đăng Nhập khi Đăng ký */}
                 {!isLogin && (
                     <Form.Item
                         label={<span className="font-medium">Tên Đăng Nhập</span>}
                         name="taiKhoan"
-                        rules={[{ required: true, message: "Vui lòng nhập Tên Đăng Nhập!" }]}
+                        rules={[
+                            { required: true, message: "Vui lòng nhập Tên Đăng Nhập!" },
+                        ]}
                     >
                         <Input
                             placeholder="Nhập Tên Đăng Nhập của bạn"
@@ -156,7 +169,6 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
                 >
                     <Input.Password
                         placeholder="Nhập mật khẩu"
-                        
                         size="large"
                         className="rounded-lg"
                         iconRender={(visible) =>
@@ -165,7 +177,6 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
                     />
                 </Form.Item>
 
-                {/* Xác nhận mật khẩu — chỉ khi Đăng ký */}
                 {!isLogin && (
                     <Form.Item
                         label={<span className="font-medium">Xác nhận mật khẩu</span>}

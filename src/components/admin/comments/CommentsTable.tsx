@@ -56,6 +56,7 @@ export default function CommentsTable() {
             postTitle: "Giới thiệu Next.js 15",
             status: "hidden",
         },
+        
     ]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);

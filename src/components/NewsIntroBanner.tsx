@@ -152,7 +152,7 @@ export default function HomeIntroSection() {
                             </div>
                             <div className="flex-1">
                                 <h4 className="text-[15px] font-semibold text-gray-800 hover:text-blue-600 line-clamp-2">
-                           8         {post.title}
+                                {post.title}
                                 </h4>
                                 <p className="text-gray-600 text-xs mt-1 line-clamp-2">
                                     {post.desc}

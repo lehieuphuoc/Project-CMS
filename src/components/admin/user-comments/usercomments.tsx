@@ -73,15 +73,26 @@ export default function usercomments() {
     ]);
 
     const handleDelete = (userId: number, commentId: number) => {
-        setUsers((prev) =>
-            prev.map((u) =>
-                u.id === userId
-                    ? { ...u, comments: u.comments.filter((c) => c.id !== commentId) }
-                    : u
-            )
-        );
+        setUsers(prev => {
+            const next = prev.map(u =>
+                u.id === userId ? { ...u, comments: u.comments.filter(c => c.id !== commentId) } : u
+            );
+
+
+            setSelectedUser(prevSel => {
+                if (!prevSel) return prevSel;
+                if (prevSel.id !== userId) return prevSel;
+                const updated = next.find(u => u.id === userId) || null;
+
+                return updated;
+            });
+
+            return next;
+        });
+
         message.success("Đã xóa bình luận!");
     };
+
 
     // ======== Cột danh sách người dùng ========
     const userColumns = [
